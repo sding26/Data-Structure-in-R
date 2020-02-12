@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575999302261.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3391910300",
+    "id" : "A7FFA706",
+    "lastKnownWriteTime" : 1575960426,
+    "last_content_update" : 1575960426,
+    "path" : "~/Desktop/BestBuyExplore/R/Search_Brand.R",
+    "project_path" : "Search_Brand.R",
+    "properties" : {
+        "cursorPosition" : "7,2",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

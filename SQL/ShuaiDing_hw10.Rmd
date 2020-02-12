@@ -1,0 +1,164 @@
+---
+title: "Homework 10"
+author: "Shuai Ding"
+date: "11/29/2019"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme:  spacelab
+always_allow_html: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache=FALSE)
+```
+
+```{r}
+library(DBI)
+witch_con <- dbConnect(
+  RMySQL::MySQL(),
+  user = 'student',
+  password = 'mds-is-fun',
+  dbname = 'witchcraft',
+  host = 'tbrambor.csbmzoea3lu9.us-east-1.rds.amazonaws.com',
+  port = 3306
+)
+```
+
+## 1. Getting to know the data
+#### a) Show a list of the tables included in the database.
+
+```{sql, connection="witch_con"}
+SHOW TABLES
+```
+
+#### b) Display the column names for the table accused.
+```{sql, connection="witch_con"}
+SHOW COLUMNS FROM accused
+```
+
+#### c) How many people are included in the accused table?
+```{sql, connection="witch_con"}
+SELECT COUNT(*)
+FROM accused
+WHERE firstname is NOT NULL or lastname is NOT NULL
+```
+
+> 3218 people are included in the accused table
+
+#### d) Display the columns firstname, sex, and age for 5 cases in the accused table.
+```{sql, connection="witch_con"}
+SELECT firstname, sex, age
+FROM accused
+LIMIT 5;
+```
+
+#### e) Looks like the age is missing for some observations. Count the number of nonmissing values for age in the data.
+```{sql, connection="witch_con"}
+SELECT COUNT(age)
+FROM accused
+WHERE age IS NOT NULL
+```
+
+> 166 nonmissing values for age in the data
+
+### f) Show a list of unique occupations.
+
+```{sql, connection="witch_con"}
+SELECT DISTINCT occupation
+FROM accused
+WHERE occupation IS NOT NULL
+```
+
+## 2. Seeing the Devil
+#### a) List the unique devil_types in the data.
+```{sql, connection="witch_con"}
+SELECT DISTINCT devil_type
+FROM devilappearance
+```
+
+#### b) How many of the sightings mention the word "black" in the description?
+```{sql, connection="witch_con"}
+SELECT COUNT(devil_text)
+FROM devilappearance
+WHERE devil_text LIKE '%black%'
+```
+
+> 121 sightings mention the word "black" in the description.
+
+#### c) What proportion of the devils (in devil_type) are male?
+
+```{sql, connection="witch_con"}
+SELECT COUNT(*) / (SELECT COUNT(*)
+FROM devilappearance
+WHERE devil_type IS NOT NULL) as proportion
+FROM devilappearance
+WHERE devil_type = 'Male' or devil_type = 'Male Fairy' 
+```
+> 65.7% % of the devils are male.
+
+
+```{sql, connection="witch_con"}
+SELECT COUNT(*) / (SELECT COUNT(*)
+FROM devilappearance) as proportion
+FROM devilappearance
+WHERE devil_type = 'Male' or devil_type = 'Male Fairy' 
+```
+> 65.4% % of the devils are male (NULL included).
+
+## 3. The trial
+#### a) What are the average and maximum numbers of male and female accusers?
+```{sql, connection="witch_con"}
+SELECT AVG(female_accusers),  MAX(female_accusers), AVG(male_accusers), MAX(male_accusers)
+FROM   trial 
+```
+
+#### b) Count the number of sentences by sentence type. List them in a table (in descending order), excluding missing values. Rename the column headings to something sensible.
+```{sql, connection="witch_con"}
+SELECT sentence, COUNT(*) AS "Number of sentences"
+FROM trial
+WHERE sentence IS NOT NULL
+GROUP BY sentence
+ORDER BY 2 DESC;
+```
+
+#### c) Do the number of accusers matter for the verdict? Compare the average number of accusers by the type of verdict. Again make sure the table is sorted and the headings make sense.
+
+```{sql, connection="witch_con"}
+SELECT verdict, 
+       AVG(female_accusers)+AVG(male_accusers) as 'Average number of accusers'
+
+FROM trial
+WHERE verdict IS NOT NULL
+GROUP BY verdict
+ORDER BY 1 DESC;
+```
+
+## 4. Tortured Truth
+#### a) Left join the trial and confession tables. For what share of trials does the database record confessions? Create a results table with the number of all trials, the number of confessions, and the share of trials with confessions recorded.
+```{sql, connection="witch_con"}
+SELECT COUNT(trial.trialref),COUNT(confession.trialref),
+COUNT(confession.trialref)/COUNT(trial.trialref) as 'Share'
+
+FROM trial LEFT OUTER JOIN confession
+  ON confession.trialref = trial.trialref  
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

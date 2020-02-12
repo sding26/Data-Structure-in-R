@@ -1,0 +1,25 @@
+"0","```r
+get_result <- GET(endpoint)
+get_result$status_code
+```"
+"1","[1] 200
+"
+"0","```r
+str(get_result, max.level = 1)
+```"
+"1","List of 10
+ $ url        : chr \"https://data.lacity.org/resource/63jg-8b9z.csv\"
+ $ status_code: int 200
+ $ headers    :List of 19
+  ..- attr(*, \"class\")= chr [1:2] \"insensitive\" \"list\"
+ $ all_headers:List of 1
+ $ cookies    :'data.frame':	0 obs. of  7 variables:
+ $ content    : raw [1:299252] 22 64 72 5f ...
+ $ date       : POSIXct[1:1], format: \"2019-11-12 01:18:04\"
+ $ times      : Named num [1:6] 0 0.0816 0.0934 0.1515 0.2522 ...
+  ..- attr(*, \"names\")= chr [1:6] \"redirect\" \"namelookup\" \"connect\" \"pretransfer\" ...
+ $ request    :List of 7
+  ..- attr(*, \"class\")= chr \"request\"
+ $ handle     :Class 'curl_handle' <externalptr> 
+ - attr(*, \"class\")= chr \"response\"
+"

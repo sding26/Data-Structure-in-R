@@ -1,0 +1,146 @@
+---
+title: "Homework 09"
+author: "Shuai Ding"
+date: "11/19/2019"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+always_allow_html: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache=FALSE)
+```
+
+## 1. Get HTML
+```{r}
+library(rvest)
+wiki <- read_html("https://en.wikipedia.org/wiki/Mitch_McConnell")
+wiki
+```
+
+## 2. Get the info box
+
+```{r}
+info <- html_node(wiki, ".infobox.vcard")
+info
+```
+
+## 3. Make a data frame
+
+```{r}
+library(knitr)
+# a) Parse the infobox table HTML you obtained above into a data frame.
+# b) Name the columns of the table you obtain key and value.
+table_df <- html_table(info, header = FALSE)
+colnames(table_df) <- c("key", "value") 
+table_df <- data.frame(table_df)
+table_df$key[1] = "Full name"
+# c) Filter the data frameto the "Full name", "Political Party", and "Children".
+df3 <- table_df[table_df$key %in% c("Full name","Political party","Children"),]
+df3
+```
+
+## 4. Make a function
+```{r}
+get_wiki_info <- function(url){
+  content <- read_html(url)
+  info <- html_node(content, ".infobox.vcard")
+  table_df <- html_table(info, header = FALSE)
+  colnames(table_df) <- c("key", "value") 
+  table_df <- data.frame(table_df)
+  table_df$key[1] = "Full name"
+  if ("Children" %in% table_df$key){
+    df <- table_df[table_df$key %in% c("Full name","Political party","Children"),]
+  return(df)
+  }
+  else {
+    df <- table_df[table_df$key %in% c("Full name","Political party"),]
+    df <- rbind(df, c("Children",NA))
+    return(df)
+  }
+}
+get_wiki_info("https://en.wikipedia.org/wiki/Tammy_Duckworth")
+get_wiki_info("https://en.wikipedia.org/wiki/Susan_Collins")
+```
+
+## 5. Get all senators' pages
+
+>a) On this page (https://en.wikipedia.org/wiki/Current_members_of_the_United_States_Senate) you find a list of all current senators of the U.S. congress.
+
+```{r}
+library(xml2)
+library(rvest)
+html <- read_html("https://en.wikipedia.org/wiki/Current_members_of_the_United_States_Senate")
+links<-html %>%
+  html_nodes("#senators") %>% 
+  html_nodes(".vcard") %>% 
+  html_node("a") %>% 
+  html_attr("href") 
+print(typeof(links))
+```
+
+>b) Create a loop that uses your get_wiki_info function to import the information on political party and number of children for all members of the senate.
+
+```{r}
+df_finish <- data.frame(Name=character(),
+                   PoliticalParty = character(),
+                   Children = integer(),
+                   stringsAsFactors=FALSE)
+                   
+for (each in links) {
+  url = paste("https://en.wikipedia.org",each,sep="")
+  df <- get_wiki_info(url)
+  df <- data.frame(Name = df$value[1],
+                   PoliticalParty = df$value[2],
+                   Children = df$value[3])
+  df_finish <- rbind(df_finish,df)
+}
+df_finish
+```
+
+
+>c) Clean up your data to provide some summary statistics. How many children does the average senator have? What about by party affiliation?
+
+#### 2.31 children the average senator have. 
+#### Republican: 2.62 children the average republican senator have.
+#### Democratic: 1.89 children the average democratic senator have.
+
+```{r}
+library(dplyr)
+library(stringr)
+# change records for children as numeric 
+a <- c(9,13,30,36,41,43,49,56,59,61,88,90,95)
+b <- c(1,4, 1, 1, 2, 3, 4, 1, 2, 1, 5, 1,3)
+df_finish$Children[a] <- b
+#df_finish
+#df_finish[is.na(df_finish)] <- 0
+print(summary(df_finish))
+```
+
+```{r}
+Rep <- df_finish[str_detect(df_finish$PoliticalParty, "Republican"),] 
+print(summary(Rep))
+```
+
+```{r}
+Dem <- df_finish[str_detect(df_finish$PoliticalParty, "Democratic"),] 
+print(summary(Dem))
+```
+
+
+
+
+
+
+
+
+
+
+
+

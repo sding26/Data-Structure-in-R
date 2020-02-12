@@ -1,0 +1,42 @@
+---
+title: "The BestBuyExplore API Package Explained"
+author: "Shuai Ding"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{The BestBuyExplore API Package Explained}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The `BestBuyExplore` package contains three functions: `Search_TV_Brand`, `Search_Store` and `Search_Trending_OpenBox`.
+
+## `Search_TV_Brand` Function
+
+The `Search_TV_Brand` function allows the user to enter a brand name of TV. It will return a dashboard listing all characteristics of that brand and sort by the best-selling products over the last week in Best Buy.
+
+```{r, echo=TRUE}
+library(BestBuyExplore)
+#Search_TV_Brand("Sony", TRUE,TRUE)
+# This function returns an shiny dashboard. so it cannot be displayed here.
+```
+
+## `Search_Store` Function
+
+This function returns stores information for all Best Buy stores within the radius of the given postal code.
+
+```{r, echo=TRUE}
+Search_Store(10025, 20)
+```
+
+## `Search_Trending_OpenBox` Function
+
+This function allows the user to enter a specific category. It searches trending products within the given category and returns specific number of trending products with Open Box service.
+
+```{r}
+Search_Trending_OpenBox()
+```
+
+
+
+

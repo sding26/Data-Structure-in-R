@@ -1,0 +1,4 @@
+"0","```r
+library(httr)
+endpoint <- \"https://data.lacity.org/resource/63jg-8b9z.csv\"
+```"

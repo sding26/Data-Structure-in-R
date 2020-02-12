@@ -1,0 +1,10 @@
+"0","```r
+#R.home(component = \"home\")
+#usethis::edit_r_environ()
+
+query_params <- list(\"$limit\" = \"10000\", \"$$app_token\" = Sys.getenv(\"LACRIME_APP_TOKEN\"))
+query_response <- GET('https://data.lacity.org/resource/63jg-8b9z.csv',query = query_params)
+query_response$status_code
+```"
+"1","[1] 200
+"

@@ -1,0 +1,28 @@
+"0","```r
+library(tidyverse)
+df <- as.data.frame(content(query_response_5))
+df1 <- df %>% select(lat, lon, area_name) 
+df2 <- df1[1:50,]
+df_finish = data.frame(lat=double(),
+                 lon=double(), 
+                 locationrevgeo=character(), 
+                 stringsAsFactors=FALSE)
+url <- \"https://nominatim.openstreetmap.org/reverse\"
+for (i in 1:50){
+  query_pa <- list(\"lat\" =df2$lat[i],\"lon\"= df2$lon[i], \"format\" = \"json\", Sys.sleep(0.1))
+  if (http_error(url)){
+    warning(\"Failure\")
+  }else{
+    content(query_pa)}
+  loc_output <- GET(url, query = query_pa)
+  loc_response <- content(loc_output)
+  j_new = \"\"
+  for (j in loc_response$address) {
+    j_new = paste(j_new, j)
+  }
+  df_3 <- content(loc_output)
+  df_3 <- data.frame(lat = df2$lat[i], lon = df2$lon[i],location = df2$area_name[i], locationrevgeo =  j_new)
+  df_finish = rbind(df_finish, df_3)
+}
+df_finish
+```"

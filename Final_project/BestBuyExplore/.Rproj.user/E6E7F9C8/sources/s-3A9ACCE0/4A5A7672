@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576279504585.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "614076422",
+    "id" : "4A5A7672",
+    "lastKnownWriteTime" : 1576280637,
+    "last_content_update" : 1576280637803,
+    "path" : "~/Documents/GitHub/Ding_Shuai/Final_project/BestBuyExplore/vignettes/BestBuyExplore-vignette.Rmd",
+    "project_path" : "vignettes/BestBuyExplore-vignette.Rmd",
+    "properties" : {
+        "cursorPosition" : "27,17",
+        "scrollLine" : "8"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

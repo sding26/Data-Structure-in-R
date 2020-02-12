@@ -1,0 +1,168 @@
+---
+title: "Homework 03"
+author: "Shuai Ding"
+date: "10/03/2019"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+always_allow_html: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache=FALSE)
+```
+
+# Monkey song
+## a) Write a loop
+```{r}
+
+for (i in 10:0) {
+  if (i > 1) {
+    if (i >= 8){
+      cat(i, "little monkeys jumping on the bed,","\n","One fell down and bumped his head,", "\n","Mama called the doctor and the doctor said,","\n",'"No more monkeys jumping on the bed!".', "\n")
+    }
+    else if (i < 8 ) {
+      monkey_i <- paste(i, "little monkeys jumping on the bed,", "\n","One fell down and bumped his head,", "\n", "Mama called the doctor and the doctor said,","\n", '"No more monkeys jumping on the bed!".', "\n")
+    }
+  }
+  else if (i == 1){
+    monkey_i <- paste(i, "little monkey jumping on the bed,", "\n","He fell down and bumped his head,", "\n", "Mama called the doctor and the doctor said,","\n", '"No more monkeys jumping on the bed!".', "\n")
+  }   
+  else if (i == 0) {
+    monkey_i <- paste( "No little monkeys jumping on the bed,","\n", "None fell down and bumped their head,", "\n", "Papa called the doctor and the doctor said,","\n",'"Put those monkeys right to bed!"')
+  }
+}
+
+
+```
+
+## b) Convert loop to a function
+
+```{r}
+monkey_song <- function(number=10, animal="Monkey") {
+  if (!is.numeric(number)) {
+    stop("Hey! Number of the animal must be a numeric vector.")
+  }
+  else if (number < 3) {
+    print("Please enter a number larger or equal to 3!")
+  }
+  else if (number >= 3) {
+    for (i in number : 0) {
+      if (i > 1) {
+        cat(i, "little", paste0(animal, "s"), "jumping on the bed,","\n","One fell down and bumped his head,","\n","Mama called the doctor and the doctor said,","\n",'"No more', paste0(animal, "s"),'jumping on the bed!".',"\n")
+        
+      }
+      else if (i == 1) {
+        cat(i, "little", animal, "jumping on the bed,", "\n","He fell down and bumped his head,", "\n", "Mama called the doctor and the doctor said,","\n", '"No more', paste0(animal, "s"), 'jumping on the bed!".', "\n")
+      }
+      else if (i == 0) {
+        cat( "No little", paste0(animal, "s"), "jumping on the bed,","\n", "None fell down and bumped their head,", "\n", "Papa called the doctor and the doctor said,","\n",'"Put those',paste0(animal, "s"),'right to bed!"')
+      }
+    }
+  }
+}
+
+monkey_song(3, "Piglet")
+
+```
+## (optional): Convert loop to a fully generalized function
+```{r}
+monkey_song <- function(number=10, animal="Monkey", activity= "jumping",probability) {
+  if (!is.numeric(number)) {
+    stop("Hey! Number of the animal must be a numeric vector.")
+  }
+  for (i in number : 0) {
+    if (i > 1) {
+      name <- sample(c("Mama", "Papa"), 1, replace = TRUE, prob =c(probability, 1-probability))
+      cat(i, "little", paste0(animal, "s"), activity, "on the bed,","\n","One fell down and bumped his head,","\n",name, "called the doctor and the doctor said,","\n",'"No more', paste0(animal, "s"),activity, 'on the bed!".',"\n")
+        
+    }
+    else if (i == 1) {
+      name <- sample(c("Mama", "Papa"), 1, replace = TRUE,prob =c(probability, 1-probability))
+      cat(i, "little", animal,activity, "on the bed,", "\n","He fell down and bumped his head,", "\n", name, "called the doctor and the doctor said,","\n", '"No more',paste0(animal, "s"),activity,'on the bed!".', "\n")
+    }
+    else if (i == 0) {
+      name <- sample(c("Mama", "Papa"), 1, replace = TRUE,prob =c(probability, 1-probability))
+      cat( "No little", paste0(animal, "s"),activity, "on the bed,","\n", "None fell down and bumped their head,", "\n", name, "called the doctor and the doctor said,","\n",'"Put those', paste0(animal, "s"),'right to bed!"')
+    }
+  }
+}
+
+monkey_song(3, "Kangaroo", "dancing", 0.5)
+```
+
+# 2. Draw a plot using a loop
+
+## a) Plot with horizontal lines
+
+```{r}
+plot(1, type="n", xlab="X-Axis", ylab="Y-Axis", xlim = c(0, 10), ylim = c(0, 10))
+for (i in 0:10) {
+  lines(x = c(0, 10), y = c(i,i))
+}
+
+```
+
+## b) Add vertical lines
+```{r}
+plot(1, type="n", xlab="X-Axis", ylab="Y-Axis", xlim = c(0, 10), ylim = c(0, 10))
+for (i in 0:10) {
+  lines(x = c(0, 10), y = c(i,i))
+  lines(x = c(i, i), y = c(0,10))
+}
+```
+
+## c) Add points
+```{r}
+plot(1, type="n", xlab="X-Axis", ylab="Y-Axis", xlim = c(0, 10), ylim = c(0, 10))
+for (i in 0:10) {
+  lines(x = c(0, 10), y = c(i,i))
+  lines(x = c(i, i), y = c(0,10))
+  points(x=i,y=i)
+  points(x=i,y=10-i)
+}
+```
+
+## d) Convert to function
+```{r}
+pic <- function (size = 10, horizontal_lines = TRUE, vertical_lines= TRUE, points= TRUE) {
+  plot(1, type="n", xlab="X-Axis", ylab="Y-Axis", xlim = c(0, size), ylim = c(0, size))
+  for (i in 0:size) {
+    if (horizontal_lines == TRUE) {
+      lines(x = c(0, size), y = c(i,i))
+    }
+    if (vertical_lines == TRUE) {
+      lines(x = c(i, i), y = c(0,size))
+    }
+    if (points == TRUE) {
+      points(x=i,y=i)
+      points(x=i,y=size-i)
+    }
+  }
+}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+#' Search_Brand
+#'
+#' This function display characteristics of one specific TV brand.
+#'
+#' This function allows the user to enter a brand name of TV
+#' It will list all characteristics of that brand and
+#' sort by the best-selling products over the last week.
+#'
+#' @param brand Brand of the TV
+#' @keywords brand BestBuy
+#' @export
+Search_Brand <- function(brand = "Sony") {
+  endpoint <- paste("https://api.bestbuy.com/v1/products((search=",brand,")&(categoryPath.id=abcat0101000))",sep="")
+  query_params <- list( "apiKey"=Sys.getenv("apiKey"),
+                        "format" = "json",
+                        "sort"="salesRankMediumTerm.asc",
+                        "show"="all",
+                        "pageSize"=100)
+  get_result <- httr::GET(endpoint,query = query_params)
+  pro = as.list(httr::content(get_result)$product)
+  product_info <- data.frame(Name=character(),
+                             Color = character(),
+                             Width=character(),
+                             ScreenSize=double(),
+                             DisplayType=character(),
+                             Resolution=character(),
+                             Description=character(),
+                             Condition = character(),
+                             lowPriceGuarantee=logical(),
+                             SalePrice=double(),
+                             stringsAsFactors=FALSE
+  )
+  for (i in 1:length(pro)){
+  query_result <- pro[[i]]
+  data_collect <- data.frame(Name =query_result$name,
+                             Color=query_result$color,
+                             Width=query_result$width,
+                             ScreenSize=query_result$screenSizeIn,
+                             DisplayType=query_result$displayType,
+                             Resolution=query_result$verticalResolution,
+                             Description=query_result$longDescription,
+                             Condition = query_result$condition,
+                             lowPriceGuarantee=query_result$lowPriceGuarantee,
+                             SalePrice=query_result$salePrice
+                             )
+  product_info <- rbind(data_collect, product_info)
+  }
+  return(product_info)
+}
+
+

@@ -1,0 +1,189 @@
+---
+title: "Homework 08"
+author: "Shuai Ding"
+date: "11/15/2019"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+always_allow_html: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache=FALSE)
+```
+
+
+## 1. Choose an API
+
+>a) Choose an API and briefly describe the type of data you can obtain from it. . 
+
+I chose the art API:https://metmuseum.github.io. 
+I can obtain the information(in json format) of art objects collected in met museum.
+
+>b) Provide a link to the API documentation 
+
+https://metmuseum.github.io.
+
+>c) the base URL of the API you intend to use.
+
+https://collectionapi.metmuseum.org/public/collection/v1/objects
+
+
+## 2. Authentication
+
+> a) Briefly explain how the API authenticates the user.
+
+This API is open access so we don't need the API authentication. 
+
+>b) Apply for an API key if necessary and provide the information (with relevant URL) how that can be done.
+
+This API is open access so there is no need to apply for an API key. 
+
+## 3. Send a Simple GET request
+>a) Execute a simple GET request to obtain a small amount of data from the API. Describe a few query parameters and add them to the query. If you have a choice of the output the API returns (e.g. XML or JSON), I suggest to choose JSON because it easier to work with. Your output here should include the code for the GET request, including the query parameters.
+
+
+The parameter named "metadataDate" can return any objects with updated data after this date. 
+
+```{r}
+library(httr)
+
+endpoint <- "https://collectionapi.metmuseum.org/public/collection/v1/objects"
+get_result <- GET(endpoint)
+str(get_result, max.level = 1)
+
+query_params <- list( "metadataDate" = "2016-11-26")
+query_response <- GET(endpoint,query = query_params)
+query_response$status_code
+
+```
+
+>b) Check the status of the request (using http_status).
+
+```{r}
+http_status(query_response)
+```
+
+>c) Check the type of the response (e.g. XML, JSON, csv using http_type).
+
+```{r}
+http_type(query_response)
+```
+
+## 4. Parse the response and Create a dataset
+a) Take the response returned by the API and turn it into a useful R object (e.g. a list, vector, or data frame). Show the code how this is done.
+
+```{r}
+object <- as.list(content(query_response))
+```
+
+b) Using the API, create a dataset (in data frame format) for multiple records. I'd say a sample size greater than 100 is sufficient for the example but feel free to get more data if you feel ambitious and the API allows you to do that fairly easily. The dataset can include only a small subset of the returned data. Just choose some interesting features. There is no need to be inclusive here.
+
+```{r}
+data <- data.frame(objectID=integer(),
+                       department = character(),
+                       title = character(),
+                       culture = character(),
+                       artistDisplayName = character(),
+                       artistDisplayBio = character(),
+                       objectBeginDate = character(),
+                       objectEndDate = character(),
+                       city = character(),
+                       state = character(),
+                       country = character(),
+                 stringsAsFactors=FALSE)
+
+looplist <- object$objectIDs[1:120]
+url1 <- "https://collectionapi.metmuseum.org/public/collection/v1/objects/"
+for (i in 1:120){
+  j <- looplist[[i]]
+  response <- GET(url = paste(url1,j,sep="") )
+  output <- content(response)
+  df <- data.frame(ObjectID=output$objectID, 
+                   Department =output$department,
+                   Title = output$title, 
+                   Culture= output$culture,
+                   ArtistName=output$artistDisplayName,
+                   ArtistBio=output$artistDisplayBio,
+                   ObjectBeginDate=output$objectBeginDate,
+                   ObjectEndDate=output$objectEndDate,
+                   City=output$city,
+                   State=output$state,
+                   Country=output$country)
+  data = rbind(data, df)
+}
+data
+```
+
+>c) Provide some summary statistics of the data. Include the data frame in a .RDS file (using saveRDS) called data.rds with your submission for the grader.
+
+The dataset I got contains information of art objects with updated data after 2016-11-26.  Those objects are all in department "The American Wing" of the met museum. Most of them are american culture.
+I also provided summary statistics of the begin date of those objects. We can see that those objects are mainly made between the year of 1630 and 1909. Most of them are created around 1770s. 
+
+```{r}
+saveRDS(data, file = "data.rds")
+summary(data)
+summary(data$ObjectBeginDate)
+```
+
+## 5. API Client
+a) Your full function to access the API functionality. Set some sensible default values for the query parameters. b) The object your function returns for the default values. Please save this output object to api_client_output.RDS and include it with your submission.
+
+```{r}
+SearchArt <- function(date = "2016-11-26") {
+  # get the list of objectIDs
+  endpoint <- "https://collectionapi.metmuseum.org/public/collection/v1/objects"
+  query_params <- list( "metadataDate" = date)
+  query_response <- GET(endpoint,query = query_params)
+  object <- as.list(content(query_response))
+  looplist <- object$objectIDs[1:120]
+  # create empty dataframe 
+  data <- data.frame(objectID=integer(),
+                       department = character(),
+                       title = character(),
+                       culture = character(),
+                       artistDisplayName = character(),
+                       artistDisplayBio = character(),
+                       objectBeginDate = character(),
+                       objectEndDate = character(),
+                       city = character(),
+                       state = character(),
+                       country = character(),
+                 stringsAsFactors=FALSE)
+  url1 <- "https://collectionapi.metmuseum.org/public/collection/v1/objects/"
+  for (i in 1:120){
+  j <- looplist[[i]]
+  response <- GET(url = paste(url1,j,sep="") )
+  if (http_error(response)){
+    warning("The request produced an error.")
+  }else{
+    output <- content(response)}
+  
+  df <- data.frame(ObjectID=output$objectID, 
+                   Department =output$department,
+                   Title = output$title, 
+                   Culture= output$culture,
+                   ArtistName=output$artistDisplayName,
+                   ArtistBio=output$artistDisplayBio,
+                   ObjectBeginDate=output$objectBeginDate,
+                   ObjectEndDate=output$objectEndDate,
+                   City=output$city,
+                   State=output$state,
+                   Country=output$country)
+  data = rbind(data, df)
+}
+  return(data)
+}
+data
+saveRDS(SearchArt(), file = "api_client_output.rds")
+
+```
+
+
+
+

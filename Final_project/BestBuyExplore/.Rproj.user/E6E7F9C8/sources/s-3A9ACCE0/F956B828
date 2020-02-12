@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1577285717735.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "840110545",
+    "id" : "F956B828",
+    "lastKnownWriteTime" : 1576280077,
+    "last_content_update" : 1576280077,
+    "path" : "~/Documents/GitHub/Ding_Shuai/Final_project/BestBuyExplore/R/Search_Trending_OpenBox.R",
+    "project_path" : "R/Search_Trending_OpenBox.R",
+    "properties" : {
+        "cursorPosition" : "19,54",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

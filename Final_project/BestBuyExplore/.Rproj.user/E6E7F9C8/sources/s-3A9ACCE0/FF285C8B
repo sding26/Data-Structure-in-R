@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1577285844424.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "547238909",
+    "id" : "FF285C8B",
+    "lastKnownWriteTime" : 1576280077,
+    "last_content_update" : 1576280077,
+    "path" : "~/Documents/GitHub/Ding_Shuai/Final_project/BestBuyExplore/R/Search_TV_Brand.R",
+    "project_path" : "R/Search_TV_Brand.R",
+    "properties" : {
+        "cursorPosition" : "11,0",
+        "scrollLine" : "1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

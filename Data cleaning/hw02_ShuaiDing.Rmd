@@ -1,0 +1,126 @@
+---
+title: "Homework 02"
+author: "Shuai Ding"
+date: "9/27/2019"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+always_allow_html: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache=FALSE)
+```
+
+# Data and Tidying
+
+```{r}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+my_data = read_csv("/Users/pc/Desktop/U.S._Chronic_Disease_Indicators__CDI_.csv")
+
+```
+
+
+```{r}
+binge_drinking_1 <- my_data %>%
+   select(state = LocationDesc, statebb = LocationAbbr, year = YearStart, Question, DataValueType, DataValueAlt, StratificationCategory1,Stratification1) %>%
+  filter(Question == "Binge drinking prevalence among adults aged >= 18 years" & DataValueType =="Crude Prevalence")
+
+binge_drinking_all <- binge_drinking_1 %>%
+  filter(Stratification1 == "Overall") %>%
+  select(state, statebb, year, binge_all = DataValueAlt)
+
+
+binge_drinking_male <- binge_drinking_1 %>%
+  filter(Stratification1 == "Male") %>%
+  select(state, statebb, year, binge_male = DataValueAlt)
+
+
+binge_drinking_female <- binge_drinking_1 %>%
+  filter(Stratification1 == "Female") %>%
+  select(state, statebb, year, binge_female = DataValueAlt)
+
+binge_finish1 <- merge(binge_drinking_all, binge_drinking_male,all=TRUE)
+
+binge_finish2 <- merge(binge_finish1, binge_drinking_female,all=TRUE)
+
+```
+
+```{r}
+poverty_1 <- my_data %>%
+   select(state = LocationDesc, statebb = LocationAbbr, year = YearStart, Question, DataValueType, DataValueAlt, StratificationCategory1,Stratification1) %>%
+  filter(Question == "Poverty" & DataValueType =="Crude Prevalence")
+
+poverty_2 <- poverty_1 %>%
+  filter(Stratification1 == "Overall") %>%
+  select(state, statebb, year, poverty = DataValueAlt)
+
+
+my_data1 <- merge(binge_finish2,poverty_2,all=TRUE)
+
+write.csv(my_data1,"/Users/pc/Desktop/binge_clean.csv")
+
+
+```
+
+# Data Transformation and Summary Results
+
+# Produce a table that shows binge drinking prevalences across U.S. States in the most recent year of data for the Top 10 binge drinking states 
+
+```{r}
+#unique(my_data1$year)
+year_arrange <- binge_finish2 %>% arrange(desc(year)) %>%
+  filter(year == 2016) 
+high_binge <- year_arrange %>% arrange(desc(binge_all))
+  
+high_binge_finish <- high_binge[1:10,c(1, 4:6)]
+high_binge_finish
+
+```
+# 5.Make a simple scatter plot showing the correlation between the overall poverty prevalence in a state and the prevalence of binge drinking in the overall population. 
+
+
+```{r}
+df1 <- full_join(binge_drinking_all,poverty_2, by = NULL, na.rm = TRUE)
+
+ggplot(df1, aes(x = binge_all, y = poverty)) + geom_point(aes(color = year)) +
+  geom_point(size = .05, alpha = .4)+
+  geom_smooth(method = 'loess')+
+  labs(x = "Prevalence of binge drinking in the overall population", y = "Overall poverty prevalence in a state", title = "Correlation between poverty prevalence and binge drinking") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+> Comment: Poverty prevalence and binge drinking prevalence are positively related when binge drinking prevalence is under 13%, which means that group drinking has negative effect on economic development of one state. But when binge drinking prevalence increasing from 13% to 20%, poverty prevalence is negatively related to binge drinking prevalence. This is possible that binge drinking could be a habbit or festival of the state. Once people get used to binge drinking, their work are not effected by it. And economic is boosted by the high consumption of liquor. However, when binge drinking prevalence is higher than 23%, the prevalence of poverty increases. Also,there are several dots showing very high poverty prevalence, which are more than 40%. Goverment should be cautious of those outliers and excute control over liquor in those states. Also I noticed that different years do not have significant impact on the correaltion between poverty and binge drinking. 
+
+
+# 6. Calculate the average annual growth rates 
+
+```{r}
+year_num <- length(unique(binge_drinking_all$year))
+
+binge_drinking_all_summarize <- na.omit(binge_drinking_all) %>%
+  group_by(state) %>%
+  arrange(year) %>%
+  summarize(first_num = first(binge_all),
+            last_num = last(binge_all)) %>%
+  mutate(Average_annual_growth_rates = (last_num - first_num)*100/first_num/(year_num), Unit = '%') %>%
+  arrange(desc(Average_annual_growth_rates))
+
+increase_5 <- head(binge_drinking_all_summarize,5)
+increase_5
+
+decrease_5 <- tail(binge_drinking_all_summarize,5) %>%
+  arrange(Average_annual_growth_rates)
+decrease_5
+
+
+```

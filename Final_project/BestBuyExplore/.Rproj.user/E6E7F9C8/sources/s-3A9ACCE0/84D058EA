@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576279255088.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1158981447",
+    "id" : "84D058EA",
+    "lastKnownWriteTime" : 1576280337,
+    "last_content_update" : 1576280337153,
+    "path" : "~/Documents/GitHub/Ding_Shuai/Final_project/BestBuyExplore/R/Search_Store.R",
+    "project_path" : "R/Search_Store.R",
+    "properties" : {
+        "cursorPosition" : "13,12",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

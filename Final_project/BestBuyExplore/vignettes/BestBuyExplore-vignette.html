@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Shuai Ding" />
+
+<meta name="date" content="2019-12-13" />
+
+<title>The BestBuyExplore API Package Explained</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">The BestBuyExplore API Package Explained</h1>
+<h4 class="author">Shuai Ding</h4>
+<h4 class="date">2019-12-13</h4>
+
+
+
+<p>The <code>BestBuyExplore</code> package contains three functions: <code>Search_TV_Brand</code>, <code>Search_Store</code> and <code>Search_Trending_OpenBox</code>.</p>
+<div id="search_tv_brand-function" class="section level2">
+<h2><code>Search_TV_Brand</code> Function</h2>
+<p>The <code>Search_TV_Brand</code> function allows the user to enter a brand name of TV. It will return a dashboard listing all characteristics of that brand and sort by the best-selling products over the last week in Best Buy.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(BestBuyExplore)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co">#Search_TV_Brand(&quot;Sony&quot;, TRUE,TRUE)</span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co"># This function returns an shiny dashboard. so it cannot be displayed here.</span></a></code></pre></div>
+</div>
+<div id="search_store-function" class="section level2">
+<h2><code>Search_Store</code> Function</h2>
+<p>This function returns stores information for all Best Buy stores within the radius of the given postal code.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">Search_Store</span>(<span class="dv">10025</span>, <span class="dv">20</span>)</a></code></pre></div>
+<pre><code>##               StoreName                        Address             City
+## 1  86TH AND LEXINGTN NY             1280 Lexington Ave         New York
+## 2  62ND AND BROADWAY NY                  1880 Broadway         New York
+## 3     BRONX TERMINAL NY                610 Exterior St            Bronx
+## 4      44TH AND 5TH  NY                    529 5th Ave         New York
+## 5      23RD AND 6TH  NY                   60 W 23rd St         New York
+## 6   LONG ISLAND CITY NY             5001 Northern Blvd Long Island City
+## 7           SECAUCUS NJ         925 Patterson Plank Rd         Secaucus
+## 8       UNION SQUARE NY                   52 E 14th St         New York
+## 9            BBA060LGAC              Laguarida Airport         Flushing
+## 10     BROADWAY NOHO NY                   622 Broadway         New York
+## 11           BBA014LGAA         Laguardia Intl Airport         Flushing
+## 12           BBA048LGAD         Laguardia Intl Airport         Flushing
+## 13        FORDHAM RD NY               402 E Fordham Rd            Bronx
+## 14       JERSEY CITY NJ                    125 18th St      Jersey City
+## 15         REGO PARK NY               8801 Queens Blvd         Elmhurst
+## 16          FLUSHING NY                  13107 40th Rd         Flushing
+## 17   ATLANTIC CENTER NY               625 Atlantic Ave         Brooklyn
+## 18 BERGEN TWN CENTER NJ           2400 Bergen Town Ctr          Paramus
+## 19      MOUNT VERNON NY            555 E Sandford Blvd     Mount Vernon
+## 20  GATEWAY BROOKLYN NY                 369 Gateway Dr         Brooklyn
+## 21           PARAMUS NJ                     Route 17 N          Paramus
+## 22           BBA084EWRB                    10 Toler Pl           Newark
+## 23       KINGS PLAZA NY                  5102 Avenue U         Brooklyn
+## 24           BBA063EWR1    Newark Liberty Intl Airport           Newark
+## 25           BBA087EWRB Newark Liberty Intl Aprt Trm 3           Newark
+## 26           BBA044JFK5    John F Kennedy Intl Airport          Jamaica
+## 27           BBA013JFK7    John F Kennedy Intl Airport          Jamaica
+## 28           BBA042JFK7      JFK International Airport          Jamaica
+## 29           BBA016JFK2      JFK International Airport          Jamaica
+## 30           BBA041JFK5      JFK International Airport          Jamaica
+## 31           BBA089JFK5    JFK Intl Airport Terminal 5          Jamaica
+## 32     WEST PATERSON NJ                  30 Andrews Dr    Woodland Park
+## 33 BAY PKWY BROOKLYN NY                  8923 Bay Pkwy         Brooklyn
+## 34           YONKERS NY          2478 Central Park Ave          Yonkers
+## 35           BBT037GSNJ                1339 N Broad St       Bloomfield
+## 36     VALLEY STREAM NY                     6 West Cir    Valley Stream
+## 37          VAUXHALL NJ           2255 Springfield Ave         Vauxhall
+## 38         HARTSDALE NY              299 N Central Ave        Hartsdale
+## 39     STATEN ISLAND NY              2795 Richmond Ave    Staten Island
+## 40             UNION NJ           2391 US Highway 22 W            Union
+## 41          WESTBURY NY            1100 Old Country Rd         Westbury
+## 42           BALDWIN NY                660 Sunrise Hwy          Baldwin
+## 43         RIVERDALE NJ                 48 State Rt 23        Riverdale
+## 44        WOODBRIDGE NJ             675 US Highway 1 S           Iselin
+##    State FullPostalCode        Phone Distance
+## 1     NY     10028-2105 917-492-8870     1.43
+## 2     NY     10023-7500 212-246-9734     2.12
+## 3     NY     10451-2044 718-402-2932     2.50
+## 4     NY     10017-4608 212-808-0309     3.15
+## 5     NY     10010-5283 212-366-1373     4.10
+## 6     NY     11101-1033 718-626-7585     4.23
+## 7     NJ     07094-2744 201-325-2277     4.28
+## 8     NY     10003-4140 212-466-4789     4.62
+## 9     NY          11371 999-999-9999     5.08
+## 10    NY     10012-2600 212-673-4067     5.27
+## 11    NY          11369 999-999-9999     5.44
+## 12    NY          11369 999-999-9999     5.44
+## 13    NY     10458-5010 718-329-8788     5.86
+## 14    NJ     07310-1242 201-792-8399     5.94
+## 15    NY     11373-4449 718-393-2690     6.51
+## 16    NY     11354-5117 718-888-3629     7.39
+## 17    NY     11217-5208 718-230-7480     7.97
+## 18    NJ     07652-5031 201-556-1321     9.12
+## 19    NY     10550-4736 914-664-4425    10.51
+## 20    NY     11239-2805 718-348-2739    11.30
+## 21    NJ     07652-4216 201-652-5794    12.91
+## 22    NJ          07114 999-999-9999    13.24
+## 23    NY     11234-3321 718-677-8839    13.26
+## 24    NJ          07114 999-999-9999    13.59
+## 25    NJ          07114 999-999-9999    13.59
+## 26    NY          11430 999-999-9999    14.16
+## 27    NY          11430 999-999-9999    14.16
+## 28    NY          11430 999-999-9999    14.16
+## 29    NY          11430 999-999-9999    14.16
+## 30    NY          11430 999-999-9999    14.16
+## 31    NY          11430 999-999-9999    14.16
+## 32    NJ     07424-2640 973-812-9430    14.28
+## 33    NY     11214-6437 718-265-6950    14.28
+## 34    NY     10710-1125 914-337-4077    14.58
+## 35    NJ          07003 999-999-9999    14.87
+## 36    NY     11581-1517 516-561-7213    15.76
+## 37    NJ     07088-1100 908-206-9720    17.69
+## 38    NY     10530-1803 914-946-0707    18.23
+## 39    NY     10314-5866 718-698-7546    18.61
+## 40    NJ     07083-8517 908-810-2150    18.80
+## 41    NY     11590-5625 516-357-9025    19.46
+## 42    NY     11510-3136 516-379-0760    21.02
+## 43    NJ     07457-1602 973-283-3399    22.49
+## 44    NJ     08830-3152 732-596-1220    24.35</code></pre>
+</div>
+<div id="search_trending_openbox-function" class="section level2">
+<h2><code>Search_Trending_OpenBox</code> Function</h2>
+<p>This function allows the user to enter a specific category. It searches trending products within the given category and returns specific number of trending products with Open Box service.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">Search_Trending_OpenBox</span>()</a></code></pre></div>
+<pre><code>##    SKU_num
+## 1  6356400
+## 2  5134902
+## 3  2964179
+## 4  5847201
+## 5  5755149
+## 6  5001400
+## 7  6199700
+## 8  4750000
+## 9  6259643
+## 10 6364719
+##                                                                                                     Name
+## 1                                             JOBY - GorillaPod 3K SMART Kit Tripod - Black/Red/Charcoal
+## 2                                                       Kenwood - CMOS-230 Rear View CMOS Camera - Multi
+## 3                                                   Sony - Handycam CX405 Flash Memory Camcorder - Black
+## 4                                       Canon - PowerShot SX730 HS 20.3-Megapixel Digital Camera - Black
+## 5                                          Sony - Cyber-shot RX100 20.2-Megapixel Digital Camera - Black
+## 6                                      Panasonic - LUMIX DMC-ZS100 20.1-Megapixel Digital Camera - Black
+## 7  Panasonic - Lumix G DMC-GX85W Mirrorless Camera Two Lens Kit with 12-32mm and 45-150mm Lenses - Black
+## 8             Sony - Alpha a6000 Mirrorless Camera Two Lens Kit with 16-50mm and 55-210mm Lenses - Black
+## 9                                                  Sony - RX100 VI 21.0-Megapixel Digital Camera - Black
+## 10                                     Sony - Cyber-shot RX100 VII 20.1-Megapixel Digital Camera - Black
+##      Price
+## 1    44.99
+## 2    99.99
+## 3   199.99
+## 4   329.99
+## 5   399.99
+## 6   399.99
+## 7   449.99
+## 8   649.99
+## 9   999.99
+## 10 1199.99
+##                                                                                                                                                                                                                   Description
+## 1                             Compatible with most camcorders, cameras and cellular phones up to 6.6 lbs.; quick release system; ball head; flexible legs; aluminum and ABS plastic construction; smartphone adapter included
+## 2                            Compatible with most vehicle makes and models; RCA interface; water-resistant camera; 128&amp;#176; wide-angle lens; 1/3.6&quot; colour CMOS sensor; electronic iris system;auto-adjusting white balance.
+## 3                                          30x optical/320x digital zoom; 9.2MP effective still image resolution; low-light sensitivity; Optical SteadyShot image stabilization; BIONZ X image processor; Exmor R CMOS sensor
+## 4                                                                        40x optical/4x digital zoom3&quot; tilt-type TFT-LCD screen1080p Full HD video at up to 59.94fpsOptical Image Stabilizer (IS)Zoom Framing Assist function
+## 5                                                                                                                           3.6x optical/54x digital zoom3&quot; Xtra Fine LCD1080p HD videoOptical SteadyShot image stabilization
+## 6                                                                             10x optical/up to 4x digital zoom3&quot; TFT LCD touch display4K Ultra HD video recordingHYBRID O.I.S.+ stabilizationWiFi mobile device connectivity
+## 7                                                                                      16.0-megapixel Live MOS sensorISO expandable to 25,600Shooting speeds up to 40 fps49 focus points4K video resolution up to 30 fpsWi-Fi
+## 8                                                     24.3-megapixel, 23.5mm x 15.6mm Exmor CMOS sensorISO 100-25,600 (stills)Shooting speeds up to 11 fps179-point phase-detection and 25-point contrast-detection autofocus
+## 9  0.39-type electronic XGA OLED viewfinder8x optical/32x digital zoom2.95&quot; Xtra Fine TFT LCD with touch focus4K UHD video resolutionZeiss&amp;#174; Vario-Sonnar&amp;#174; T* zoom lensOptical image stabilization SteadyShot&amp;#8482;
+## 10                                                                                                                                   OLED viewfinder8x optical zoom3&quot; folding touch-screen LCD2160p UHD videoIntelligent AUTO
+##    ReviewScore
+## 1          4.7
+## 2          4.5
+## 3          4.5
+## 4          4.6
+## 5          4.6
+## 6          4.5
+## 7          4.5
+## 8          4.7
+## 9          4.7
+## 10         4.9</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

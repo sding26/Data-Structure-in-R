@@ -1,0 +1,199 @@
+---
+title: "Homework 04"
+author: "Shuai Ding"
+date: "10/10/2019"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme:  spacelab
+always_allow_html: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache=FALSE)
+```
+
+## 1. Functions in the dplyr Package
+### a) Longest name
+```{r}
+library(dplyr)
+library(purrr)
+library(DT)
+content <- mget(ls("package:dplyr"), inherits = TRUE)
+dplyr_functions <- Filter(is.function,content)
+```
+
+```{r}
+name_f <- map(dplyr_functions, names) %>%
+  names()
+#name_f
+len <- map_int(name_f,nchar)
+m <- max(len)
+for (name in name_f) {
+  if (nchar(name) == m) {
+    print(name)
+  }
+}
+```
+> The function named "group_by_drop_default" has the longest name.
+
+### b) Number of arguments
+```{r}
+argument <- map(dplyr_functions, formals) 
+arg <- map(argument,names) 
+#arg[[2]][2]
+
+arg_1 <- sapply(arg, length)
+max(arg_1)
+
+a <- head(arg_1[order(-unlist(arg_1))], n=10) 
+b <- as.data.frame(a)
+DT::datatable(b)
+```
+### c) Most common argument
+```{r}
+new_df <- as.data.frame(matrix(data = NA, nrow = 1, ncol = 1))
+for (i in 1:length(dplyr_functions)) {
+  for (j in 1:length(argument[[i]])) {
+    new_df <- rbind(new_df, print(names(argument[[i]][j])))
+  }
+}
+new_df <- new_df %>%
+  group_by(V1) %>%
+  summarise(count_func = n()) %>%
+  arrange(desc(count_func))
+head(new_df, n=5)  
+```
+
+> The most common argument named "...", which allows users not to specify the name of the argument. This argument will pass arguments to the functions and can be numbers or variety of arguments. 
+
+## 2. Infant Mortality and GPD per Capita
+### a) Highest and lowest infant mortality rates in 2018
+
+```{r}
+library(WDI)
+
+df <- WDI(country='all', indicator=c("NY.GDP.PCAP.PP.KD", "SP.DYN.IMRT.IN"), extra=TRUE, start = 1960, end = 2018)
+#df
+df1 <- rename(df, gdpcap = NY.GDP.PCAP.PP.KD, infmort = SP.DYN.IMRT.IN)
+#df1
+
+df2<- na.omit(df1)
+#df2
+
+df3 <- filter(df2, region != "Aggregates")
+#df3
+df4 <- arrange(df3, desc(infmort)) %>% filter(year == '2018') 
+high <- head(df4, n=5)
+df5 <- arrange(df3,infmort) %>% filter(year == '2018') 
+low <- head(df5,n=5)
+finish_country <- rbind(high, low) %>% arrange(desc(infmort)) %>% select(country, infmort, gdpcap)
+finish_country
+```
+
+### b) Overall regression
+
+```{r}
+library(ggplot2)
+summary(lm(infmort ~ gdpcap, data = df2))
+ggplot(df2, aes(x = gdpcap, y = infmort)) + geom_point() +
+  geom_point( alpha = .4)+
+  geom_smooth()+
+  labs(x = "GDP per capita", y = "Infant mortality (per 1000 live births", title = "Correlation between infant mortality and GDP per capita") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+
+> The scatter plot indicates that when GDP per capita is smaller than approximately 10000, infant mortality was high than 100 per 1000 live births. Then,infant mortality takes a steep decrease and becomes flat with GDP become higher than 10000.
+
+### c) Regression by region
+
+```{r}
+df_region <- split(df2, df2$region)
+str(df_region)
+
+df7 <- df2 %>% 
+  split(df2$region) %>%
+  map(~ lm(infmort ~ gdpcap, data = .)) %>%
+  map(~ coef(.)) %>%
+  map_dbl("gdpcap")
+
+df_coef <- as.data.frame(sort(df7) )
+df_coef
+
+```
+
+### d) Regression by country
+
+```{r}
+df_country <- split(df3, df3$country)
+#str(df_country)
+lr_country <- map(df_country, ~ lm(infmort ~ gdpcap, data = .)) %>%
+  map(summary)
+
+#df3
+lr0 = df3 %>%
+  group_by(country) %>%
+  group_modify(.f = ~broom::tidy(lm(infmort ~ gdpcap, data = .)))
+                               
+lr1 = df3 %>%
+  group_by(country) %>%
+  group_modify(.f = ~broom::tidy(lm(infmort ~ gdpcap, data = .), conf.int = 0.95))
+
+lr2 <- lr1 %>% 
+  select(country, estimate, term) %>%
+  filter(term == 'gdpcap') %>%
+  filter(estimate > 0)
+summary(lr2)
+# 14 countries indicate positive relation
+lr3 <- lr0 %>% 
+  filter(term == 'gdpcap') %>%
+  select(country, estimate)
+lr3
+ggplot(data = lr3, aes(x=estimate)) + geom_histogram()
+
+
+```
+
+
+> 14 (6.09%) countries have positive relation, which are most at odds with the overall regression estimated in part(b).
+
+### e) Added squared term
+
+```{r}
+finish_1 = df3 %>%
+  group_by(country) %>%
+  group_modify(.f = ~ broom::glance(lm(infmort ~ gdpcap, data = .))) %>%
+  select(country, origin = adj.r.squared)
+gdp_2 = df3$gdpcap
+finish_2 = df3 %>%
+  mutate(gdpcap_squ = (gdp_2 * gdp_2)) %>%
+  group_by(country) %>%
+  group_modify(.f = ~ broom::glance(lm(infmort ~ gdpcap + gdpcap_squ, data = .))) %>%
+  select(country, square_gdp = adj.r.squared)
+#finish_2
+
+finish <- full_join(finish_1, finish_2) %>%
+  dplyr::ungroup(.) %>%
+  filter(square_gdp > origin)
+finish
+```
+
+> For aforementioned countries in the table, r squared increases. And for 155 countries out of 186 countries show better predicting performance, I recommend to keep squared term. 
+
+
+
+
+
+
+
+
+
+
+
+

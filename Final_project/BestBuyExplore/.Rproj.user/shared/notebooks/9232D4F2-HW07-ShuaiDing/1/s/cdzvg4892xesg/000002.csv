@@ -1,0 +1,7 @@
+"0","```r
+query_params_5 <- list(\"$limit\" = \"10000\", \"$$app_token\" = Sys.getenv(\"LACRIME_APP_TOKEN\"), \"area_name\" = \"Newton\",\"vict_age\" = 19)
+query_response_5 <- GET('https://data.lacity.org/resource/63jg-8b9z.csv',query = query_params_5)
+query_response_5$status_code
+```"
+"1","[1] 200
+"

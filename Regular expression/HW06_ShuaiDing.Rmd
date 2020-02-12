@@ -1,0 +1,162 @@
+---
+title: "Homework 06"
+author: "Shuai Ding"
+date: "10/27/2019"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: spacelab
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme:  spacelab
+always_allow_html: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache=FALSE)
+```
+
+```{r}
+library(ScrabbleScore)
+library(stringr)
+data(twl06)
+scrabble <- twl06
+#print(scrabble)
+```
+
+## a) Words with z
+```{r}
+z_sub <- str_subset(scrabble, "z")
+z_count <- str_count(z_sub, "z")
+table(z_count)
+```
+
+## b) Word lengths
+```{r}
+len_count <- str_length(scrabble)
+hist(len_count)
+
+```
+
+## c) Vowels
+```{r}
+vowels <- '^[aeiouAEIOU].*[aeiouAEIOU]$'
+str1<- str_subset(scrabble, pattern = vowels)
+length(str1)
+```
+
+## d) Longest word with New York
+```{r}
+new<- str_subset(scrabble, pattern = '^[newyork]+$')
+new[which(nchar(new) == max(nchar(new)))]
+```
+
+## e) Consonants only
+```{r}
+for (num in max(nchar(scrabble)):1) {
+  target <- str_subset(scrabble, paste("[^aeiou]{", num, ",}",sep=""))
+  if (length(target) > 0) {
+    print(target)
+    break
+  }
+}
+```
+
+# 2. Emergency Hospital Injuries
+
+## a) Fractures
+```{r}
+data = read.csv("/Users/pc/Documents/GitHub/course_materials/Exercises/hw06/emergency.csv", header=FALSE)
+names(data)[1] <- "column"
+```
+```{r}
+frac <- str_subset(data$column, pattern = "FRACTURE|FRACTURED|FRACTURES|FRACTURING")
+head(frac) #the full "fractures" narratives are too many
+print(length(frac))  
+```
+
+## c) Body Parts
+```{r}
+# body parts: skull,finger,hand,hands,ankle, elbow,thumb
+skull <- str_count(frac, pattern="[S][K][U][L][L]")
+finger <- str_count(frac, pattern="[F][I][N][G][E][R]")
+foot <- str_count(frac, pattern="[F][O][O][T]|[F][E][E][T]")
+elbow <- str_count(frac, pattern="[E][L][B][O][W]")
+thumb <- str_count(frac, pattern="[T][H][U][M][B]")
+ankle <- str_count(frac, pattern="[A][N][K][L][E]")
+body <- list(skull, finger, foot, elbow, thumb, ankle)
+num <- c()
+for (bp in body){
+  i=1
+  for(i in 1:length(bp)) {
+  if (bp[i]>=1){
+    bp[i]=1
+  }
+  else {
+    bp[i] =0
+  }
+  }
+  num<-c(m, sum(bp))
+}
+num <- num[1:length(body)] #somehow my loop always contains twice of the last value, so I just selected first 6 values. We have not learnt how to append values to a list in the class, so I hope this will not result in score cut :)
+bodypart <-c('skull', 'finger', 'foot', 'elbow', 'thumb', 'ankle')
+barplot(num, names.arg = bodypart, main = "Bar plot of body part fractures", xlab = "Body part", ylab = "Counts", ylim = c(0,70))
+
+```
+
+
+## d) Age and Gender
+
+There 3412 female and 4074 male in the data. 
+```{r}
+library(stringr)
+library(dplyr)
+library(ggplot2)
+
+female<- str_subset(data$column, pattern="FEMALE|MOF|YOF|\bF\b|YF")
+female_year<-str_subset(female, pattern="[0-9]{1,2}.*(YO|Y/O|Y|YR O|YEAR)")
+female_year_age<- str_extract(female_year, pattern="[0-9]{1,2}")
+
+female_month<-str_subset(female, pattern="[0-9]{1,2}.*(MONTH|MO)")
+female_month_age<- str_extract(female_month, pattern="[0-9]{1,2}")
+
+female_month_age<-as.numeric(female_month_age)%/% 12
+
+finish1<- rbind(age=female_year_age, gender=c('F'))%>% t()
+finish2<-rbind(age=female_month_age, gender=c('F'))%>% t()
+finish_female<- rbind(finish1,finish2)
+print(length(finish_female)/2)
+
+male<- str_subset(data$column, pattern="MOM|\bMALE\b|YOM|\bM\b|YM")
+male_year<- str_subset(male, pattern="[0-9]{1,2}.*(YO|Y/O|Y|YR O|YEAR)")
+male_year_age<- str_extract(male_year, pattern="[0-9]{1,2}")
+
+male_month<-str_subset(male, pattern="[0-9]{1,2}.*(MONTH|MO)")
+male_month_age<- str_extract(male_month, pattern="[0-9]{1,2}")
+male_month_age<-as.numeric(male_month_age)%/% 12
+
+finish3<- rbind(age=male_year_age, gender=c('M')) %>% t()
+finish4<-rbind(age=male_month_age, gender=c('M')) %>% t()
+finish_male<- rbind(finish3,finish4)
+print(length(finish_male)/2)
+
+all_genders<- rbind(finish_female, finish_male)
+finish<-as.data.frame(all_genders) %>% group_by(age, gender) %>% summarize(number=n())
+
+ggplot(finish, aes(x=age,y=number,group=gender))+ ylab("Count of injuries")+geom_line(aes(color=gender))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
