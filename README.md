@@ -1,2 +1,2 @@
 # Data-Structure-of-R
-Basic data structure of R language and API package
+Data structure in R language and API package
